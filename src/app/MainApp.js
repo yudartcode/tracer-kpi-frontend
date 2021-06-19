@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Layout, Menu, TreeSelect } from 'antd';
 import Dashboard from './views/Dashboard';
-import OrganizationUnitSelector from './views/OrganizationUnitSelector';
 import { Api } from './views/Api';
 
 const { Header, Content, Footer } = Layout;
@@ -28,7 +27,8 @@ const MainApp = () => {
                 title: 'Node2',
                 value: '0-1',
             },
-        ]
+        ],
+        value: 'AWDfATa8TT1'
     })
 
     const findChildrens = (parent, ou) => {
@@ -50,18 +50,23 @@ const MainApp = () => {
             parent.children = children;
         }
 
-        // console.log(parent);
-
         return parent;
     };
 
     async function getOu() {
         const res = await Api.getOrgUnit()
-        console.log(res.data);
-        // setState({
-        //     ...state, 
-        //     ou: findChildrens({ id: 'AWDfATa8TT1'}, res.data)
-        // })
+        const parent = res.data.organisationUnits.find((x) => x.id === 'AWDfATa8TT1')
+        const ou = findChildrens({ id: 'AWDfATa8TT1'}, res.data)
+        ou.title = parent.displayName
+        ou.value = parent.id
+        setState({
+            ou: [ou],
+            value: parent.id
+        })
+    }
+
+    const onChange = value => {
+        setState({...state, value})
     }
 
     useEffect(() => {
@@ -75,14 +80,15 @@ const MainApp = () => {
                     showSearch={true}
                     allowClear={true}
                     treeDefaultExpandAll={false}
-                    // value={ou.selectedOrganisationUnit}
+                    value={state.value}
                     treeData={state.ou}
                     style={{ width: 300 }}
+                    onChange={onChange}
                     />
             </Header>
             <Content>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 500 }}>
-                    <Dashboard />
+                    <Dashboard orgUnit={state.value}/>
                 </div>
             </Content>
             <Footer style={{ textAlign: 'center' }}>Lacak Covid {currentDate.getFullYear()}</Footer>

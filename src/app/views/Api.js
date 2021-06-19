@@ -1,4 +1,4 @@
-import { getWithAuth } from "../utils/requestHandler";
+import { getKPI, getWithAuth } from "../utils/requestHandler";
 
 export const Api = {
   async getOrgUnit() {
@@ -7,6 +7,10 @@ export const Api = {
   },
   async getUserGroup() {
     const response = await getWithAuth(`/userGroups.json?fields=displayName,id&paging=false`);
+    return response;
+  },
+  async getKpi(params) {
+    const response = await getKPI(`/tracer`, params);
     return response;
   },
 };
