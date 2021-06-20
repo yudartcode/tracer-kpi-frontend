@@ -1,2 +1,0 @@
-export const COVID_CONFIRMATION_PROGRAM_CODE = 'gZrezya1BvN';
-export const COVID_CONTACT_CASE_PROGRAM_CODE = 'QqodHvGgDrq';

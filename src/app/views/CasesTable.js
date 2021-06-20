@@ -3,10 +3,9 @@ import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Api } from './Api';
 const { RangePicker } = DatePicker;
-const { Option } = Select;
 
 export default function CasesTable(props) {
-  console.log(props.orgUnit);
+    console.log(props.orgUnit);
     const [groupBy, setGroupBy] = useState('storedBy')
     const [state, setState] = useState({
       data: null
@@ -95,6 +94,12 @@ export default function CasesTable(props) {
       getUserGroupData()
       getData()
     }, [])
+    useEffect(() => {
+        setFilter({
+            ...filter,
+            orgUID: props.orgUnit
+        })
+    }, [props])
     return (
         <div style={{ padding: 20 }}>
           <PageHeader

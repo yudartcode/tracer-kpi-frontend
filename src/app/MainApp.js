@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { Layout, Menu, TreeSelect } from 'antd';
-import Dashboard from './views/Dashboard';
+import { Layout, TreeSelect } from 'antd';
 import { Api } from './views/Api';
+import CasesTable from './views/CasesTable';
 
 const { Header, Content, Footer } = Layout;
 const currentDate = new Date();
@@ -10,22 +10,8 @@ const MainApp = () => {
     const [state, setState] = useState({
         ou: [
             {
-                title: 'Node1',
-                value: '0-0',
-                children: [
-                    {
-                        title: 'Child Node1',
-                        value: '0-0-1',
-                    },
-                    {
-                        title: 'Child Node2',
-                        value: '0-0-2',
-                    },
-                ],
-            },
-            {
-                title: 'Node2',
-                value: '0-1',
+                title: 'INDONESIA',
+                value: 'AWDfATa8TT1',
             },
         ],
         value: 'AWDfATa8TT1'
@@ -88,7 +74,9 @@ const MainApp = () => {
             </Header>
             <Content>
                 <div className="site-layout-background" style={{ padding: 24, minHeight: 500 }}>
-                    <Dashboard orgUnit={state.value}/>
+                    <div style={{ backgroundColor: "#FFFFFF" }}>
+                        <CasesTable orgUnit={state.value}/>
+                    </div>
                 </div>
             </Content>
             <Footer style={{ textAlign: 'center' }}>Lacak Covid {currentDate.getFullYear()}</Footer>
