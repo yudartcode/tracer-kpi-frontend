@@ -2,9 +2,16 @@ import { PageHeader, DatePicker, Radio, Table, Select, Button } from 'antd';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react'
 import { Api } from './Api';
+import ReactExport from "react-data-export";
+import { FileExcelOutlined } from "@ant-design/icons";
+
 const { RangePicker } = DatePicker;
 
 export default function CasesTable(props) {
+    const ExcelFile = ReactExport.ExcelFile;
+    const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
+    const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
+    const [loading, setLoading] = useState(false)
     console.log(props.orgUnit);
     const [groupBy, setGroupBy] = useState('storedBy')
     const [state, setState] = useState({
@@ -39,8 +46,11 @@ export default function CasesTable(props) {
       })
     }
     async function getData() {
-      const res = await Api.getKpi(filter)
-      setState({data: res.data})
+      setLoading(true)
+      await Api.getKpi(filter).then((res) => {
+        setState({data: res.data})
+        setLoading(false)
+      })
     }
     const groupOptions = [
       {value: 'storedBy', label:'Petugas'},
@@ -49,6 +59,22 @@ export default function CasesTable(props) {
     const onChangeGroupBy = (e) => {
       setGroupBy(e.target.value)
     }
+    const Download = () => {
+      return (
+        <ExcelFile element={<Button icon={<FileExcelOutlined />}>Download Excel</Button>}>
+          <ExcelSheet data={state.data} name="Trace">
+            <ExcelColumn label="Petugas" value="firstname" />
+            <ExcelColumn label="Username" value="username" />
+            <ExcelColumn label="PKM" value="orgl5" />
+            <ExcelColumn label="Kecamatan" value="orgl4" />
+            <ExcelColumn label="Kabupaten" value="orgl3" />
+            <ExcelColumn label="Provinsi" value="orgl2" />
+            <ExcelColumn label="Jumlah KE" value="total" />
+          </ExcelSheet>
+        </ExcelFile>
+      )
+    }
+          
     const columns = [
       {
         title: "Petugas",
@@ -140,11 +166,12 @@ export default function CasesTable(props) {
                     buttonStyle="solid"
                     />
                 </div>
-                {/* <div style={{marginLeft:'auto'}}><Download /></div> */}
+                <div style={{marginLeft:'auto'}}><Download /></div>
             </div>
             </PageHeader>
             
             <Table
+            loading={loading}
             dataSource={state&&state.data}
             columns={columns}
             rowKey="no"
