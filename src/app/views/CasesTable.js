@@ -12,11 +12,11 @@ export default function CasesTable(props) {
     const ExcelSheet = ReactExport.ExcelFile.ExcelSheet;
     const ExcelColumn = ReactExport.ExcelFile.ExcelColumn;
     const [loading, setLoading] = useState(false)
-    console.log(props.orgUnit);
     const [groupBy, setGroupBy] = useState('storedBy')
     const [state, setState] = useState({
       data: null
     })
+    const [faskes, setFaskes] = useState()
     const [userGroups, setUserGroups] = useState()
     const [filter, setFilter] = useState({
       programUID: 'QqodHvGgDrq',
@@ -44,6 +44,7 @@ export default function CasesTable(props) {
         ...filter,
         userGroup: e
       })
+      console.log(e);
     }
     async function getData() {
       setLoading(true)
@@ -56,28 +57,63 @@ export default function CasesTable(props) {
       {value: 'storedBy', label:'Petugas'},
       {value: 'orgUnitName', label:'Fasilitas Kesehatan'},
     ]
+    function toFaskes() {
+      const faskes = []
+      const data = state.data.concat()
+      data.map(e => {
+        const f = faskes.find(x => x.orgl5 === e.orgl5)
+        if (f===null||f===undefined) {
+          faskes.push(e)
+        } else {
+          const u = faskes.indexOf(f)
+          f.total+=e.total
+          f.totalcompleted+=e.totalcompleted
+          faskes[u]=f
+        }
+      });
+      setFaskes(faskes)
+    }
     const onChangeGroupBy = (e) => {
       setGroupBy(e.target.value)
+      if (e.target.value === 'orgUnitName') {
+        toFaskes()
+      }
     }
     const Download = () => {
-      return (
-        <ExcelFile element={<Button icon={<FileExcelOutlined />}>Download Excel</Button>}>
-          <ExcelSheet data={state.data} name="Trace">
-            <ExcelColumn label="Petugas" value="firstname" />
-            <ExcelColumn label="Username" value="username" />
-            <ExcelColumn label="PKM" value="orgl5" />
-            <ExcelColumn label="Kecamatan" value="orgl4" />
-            <ExcelColumn label="Kabupaten" value="orgl3" />
-            <ExcelColumn label="Provinsi" value="orgl2" />
-            <ExcelColumn label="Jumlah KE" value="total" />
-          </ExcelSheet>
-        </ExcelFile>
-      )
+      if (groupBy==='storedBy') {
+        return (
+          <ExcelFile element={<Button icon={<FileExcelOutlined />}>Download Excel</Button>}>
+            <ExcelSheet data={state.data} name="Trace">
+              <ExcelColumn label="Nama Petugas" value="firstname" />
+              <ExcelColumn label="Username" value="username" />
+              <ExcelColumn label="Puskesmas" value="orgl5" />
+              <ExcelColumn label="Kecamatan" value="orgl4" />
+              <ExcelColumn label="Kabupaten" value="orgl3" />
+              <ExcelColumn label="Provinsi" value="orgl2" />
+              <ExcelColumn label="Total KE" value="total" />
+              <ExcelColumn label="Total KE Selesai Pemantauan" value="totalcompleted" />
+            </ExcelSheet>
+          </ExcelFile>
+        )
+      } else {
+        return (
+          <ExcelFile element={<Button icon={<FileExcelOutlined />}>Download Excel</Button>}>
+            <ExcelSheet data={faskes} name="Trace">
+              <ExcelColumn label="Puskesmas" value="orgl5" />
+              <ExcelColumn label="Kecamatan" value="orgl4" />
+              <ExcelColumn label="Kabupaten" value="orgl3" />
+              <ExcelColumn label="Provinsi" value="orgl2" />
+              <ExcelColumn label="Total KE" value="total" />
+              <ExcelColumn label="Total KE Selesai Pemantauan" value="totalcompleted" />
+            </ExcelSheet>
+          </ExcelFile>
+        )
+      }
     }
           
     const columns = [
       {
-        title: "Petugas",
+        title: "Nama Petugas",
         dataIndex: "firstname",
         key: "firstname",
       },
@@ -87,7 +123,7 @@ export default function CasesTable(props) {
         key: "username",
       },
       {
-        title: "PKM",
+        title: "Puskesmas",
         dataIndex: "orgl5",
         key: "orgl5",
       },
@@ -107,9 +143,49 @@ export default function CasesTable(props) {
         key: "orgl2",
       },
       {
-        title: "TOTAL",
+        title: "Total KE",
         dataIndex: "total",
         key: "total",
+        align: 'right',
+      },
+      {
+        title: "Total KE Selesai Pemantauan",
+        dataIndex: "totalcompleted",
+        key: "totalcompleted",
+        align: 'right',
+      },
+    ];
+    const columnsFaskes = [
+      {
+        title: "Puskesmas",
+        dataIndex: "orgl5",
+        key: "orgl5",
+      },
+      {
+        title: "Kecamatan",
+        dataIndex: "orgl4",
+        key: "orgl4",
+      },
+      {
+        title: "Kabupaten",
+        dataIndex: "orgl3",
+        key: "orgl3",
+      },
+      {
+        title: "Provinsi",
+        dataIndex: "orgl2",
+        key: "orgl2",
+      },
+      {
+        title: "Total KE",
+        dataIndex: "total",
+        key: "total",
+        align: 'right',
+      },
+      {
+        title: "Total KE Selesai Pemantauan",
+        dataIndex: "totalcompleted",
+        key: "totalcompleted",
         align: 'right',
       },
     ];
@@ -119,7 +195,7 @@ export default function CasesTable(props) {
     useEffect(() => {
       getUserGroupData()
       getData()
-    }, [])
+    }, [groupBy])
     useEffect(() => {
         setFilter({
             ...filter,
@@ -147,7 +223,7 @@ export default function CasesTable(props) {
                   optionLabelProp="label"
                 >
                   { userGroups && userGroups.map(u => (
-                      <Option key={u.id} value={u.id} label={u.displayName}>
+                      <Option key={u.id} value={u.displayName} label={u.displayName}>
                         <div className="demo-option-label-item">
                         {u.displayName}
                         </div>
@@ -156,7 +232,7 @@ export default function CasesTable(props) {
                 </Select>
                 <Button key="1" onClick={onClick} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: 34, border: 'solid 1px' }}> Tampilkan Data </Button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'row', flex: 1}}>
+              <div style={{ display: 'flex', flexDirection: 'row', flex: 1, paddingTop: 20}}>
                 <div>
                     <span style={{marginRight:10}}>Group by:</span> 
                     <Radio.Group options={groupOptions} 
@@ -172,8 +248,8 @@ export default function CasesTable(props) {
             
             <Table
             loading={loading}
-            dataSource={state&&state.data}
-            columns={columns}
+            dataSource={groupBy==='orgUnitName' ? faskes : state.data}
+            columns={groupBy==='orgUnitName' ? columnsFaskes : columns}
             rowKey="no"
             pagination={{ position: ["topRight", "bottomRight"] }}
           />
