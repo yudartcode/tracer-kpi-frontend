@@ -24,7 +24,7 @@ export default function CasesTable(props) {
       endDate: moment().format('YYYY-MM-DD'),
       groupBy: null,
       orgUID: props.orgUnit,
-      userGroup: 'all',
+      userGroup: '{"all"}',
     })
     const { Option } = Select;
 
@@ -42,12 +42,12 @@ export default function CasesTable(props) {
     const setFilterUserGroup = (e) => {
       setFilter({
         ...filter,
-        userGroup: e
+        userGroup: `{"${e.join('","')}"}`
       })
-      console.log(e);
     }
     async function getData() {
       setLoading(true)
+      filter.userGroup = filter.userGroup === '{""}' ? '{"all"}' : filter.userGroup
       await Api.getKpi(filter).then((res) => {
         setState({data: res.data})
         setLoading(false)
@@ -90,6 +90,7 @@ export default function CasesTable(props) {
               <ExcelColumn label="Kecamatan" value="orgl4" />
               <ExcelColumn label="Kabupaten" value="orgl3" />
               <ExcelColumn label="Provinsi" value="orgl2" />
+              <ExcelColumn label="Kelompok Pengguna" value={(col) => col.group.join(', ')} />
               <ExcelColumn label="Total KE" value="total" />
               <ExcelColumn label="Total KE Selesai Pemantauan" value="totalcompleted" />
             </ExcelSheet>
@@ -141,6 +142,12 @@ export default function CasesTable(props) {
         title: "Provinsi",
         dataIndex: "orgl2",
         key: "orgl2",
+      },
+      {
+        title: "Kelompok Pengguna",
+        dataIndex: "group",
+        key: "group",
+        render: (text) => text.join(', ')
       },
       {
         title: "Total KE",
