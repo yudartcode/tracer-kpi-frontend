@@ -24,7 +24,7 @@ export default function CasesTable(props) {
       endDate: moment().format('YYYY-MM-DD'),
       groupBy: null,
       orgUID: props.orgUnit,
-      userGroup: 'all',
+      userGroup: '{"all"}',
     })
     const { Option } = Select;
 

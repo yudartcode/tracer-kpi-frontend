@@ -1,7 +1,7 @@
 import axios from 'axios'
 // const API_URL = process.env.URL_API
 const API_URL = 'https://training-silacak.kemkes.go.id/api'
-const API_URL_KPI = 'https://training-silacak.kemkes.go.id/kpi'
+const API_URL_KPI = 'https://kpi-silacak.kemkes.go.id/kpi'
 
 export const getWithAuth = async (url, params = {}) => {
   try {
